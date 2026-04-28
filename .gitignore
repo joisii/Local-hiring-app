@@ -1,2 +1,4 @@
 node_modules/
-.envgit status
+# ignore all env files anywhere
+.env
+**/.env
