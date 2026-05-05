@@ -2,6 +2,8 @@ import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import registerRoutes from "./Routes/registerRoutes.js";
+import { protect } from "./middleware/authMiddleware.js";
+import { authorizeRoles } from "./middleware/authMiddleware.js";
 
 
 dotenv.config();
@@ -13,6 +15,20 @@ server.use(express.json());
 
 // Routes
 server.use("/api/auth", registerRoutes);
+server.get("/api/protected", protect, (req, res) => {
+  res.json({
+    success: true,
+    message: "You accessed protected route",
+    user: req.user
+  });
+});
+
+server.get("/api/client-only", protect, authorizeRoles("client"), (req, res) => {
+  res.json({
+    success: true,
+    message: "Client access granted"
+  });
+});
 
 // DB connection
 const connectDB = async () => {
