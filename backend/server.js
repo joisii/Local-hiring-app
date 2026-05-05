@@ -4,7 +4,7 @@ import mongoose from "mongoose";
 import registerRoutes from "./Routes/registerRoutes.js";
 import { protect } from "./middleware/authMiddleware.js";
 import { authorizeRoles } from "./middleware/authMiddleware.js";
-
+import profileRoutes from "./routes/profileRoutes.js";
 
 dotenv.config();
 
@@ -29,6 +29,8 @@ server.get("/api/client-only", protect, authorizeRoles("client"), (req, res) => 
     message: "Client access granted"
   });
 });
+
+server.use("/api/profile", profileRoutes);
 
 // DB connection
 const connectDB = async () => {
