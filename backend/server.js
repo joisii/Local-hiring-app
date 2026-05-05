@@ -5,6 +5,7 @@ import registerRoutes from "./Routes/registerRoutes.js";
 import { protect } from "./middleware/authMiddleware.js";
 import { authorizeRoles } from "./middleware/authMiddleware.js";
 import profileRoutes from "./routes/profileRoutes.js";
+import workerRoutes from "./routes/workerRoutes.js";
 
 dotenv.config();
 
@@ -30,6 +31,7 @@ server.get("/api/client-only", protect, authorizeRoles("client"), (req, res) => 
   });
 });
 
+server.use("/api/workers", workerRoutes);
 server.use("/api/profile", profileRoutes);
 
 // DB connection
