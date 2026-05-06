@@ -1,11 +1,12 @@
 import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
-import registerRoutes from "./Routes/registerRoutes.js";
+import registerRoutes from "./routes/registerRoutes.js";
 import { protect } from "./middleware/authMiddleware.js";
 import { authorizeRoles } from "./middleware/authMiddleware.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import workerRoutes from "./routes/workerRoutes.js";
+import jobRoutes from "./Routes/jobRoutes.js";
 
 dotenv.config();
 
@@ -23,7 +24,7 @@ server.get("/api/protected", protect, (req, res) => {
     user: req.user
   });
 });
-
+server.use("/api/jobs", jobRoutes);
 server.get("/api/client-only", protect, authorizeRoles("client"), (req, res) => {
   res.json({
     success: true,
