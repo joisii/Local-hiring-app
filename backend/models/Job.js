@@ -18,9 +18,14 @@ const jobSchema = new mongoose.Schema({
     ref: "User",
     required: true
   },
+  worker: {
+  type: mongoose.Schema.Types.ObjectId,
+  ref: "User",
+  default: null
+},
   status: {
     type: String,
-    enum: ["pending", "ongoing", "completed"],
+    enum: ["pending", "accepted", "ongoing", "completed"],
     default: "pending"
   }
 }, { timestamps: true });
