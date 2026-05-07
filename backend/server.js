@@ -7,6 +7,7 @@ import { authorizeRoles } from "./middleware/authMiddleware.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import workerRoutes from "./routes/workerRoutes.js";
 import jobRoutes from "./Routes/jobRoutes.js";
+import reviewRoutes from "./routes/reviewRoutes.js";
 
 dotenv.config();
 
@@ -31,7 +32,7 @@ server.get("/api/client-only", protect, authorizeRoles("client"), (req, res) => 
     message: "Client access granted"
   });
 });
-
+server.use("/api/reviews", reviewRoutes);
 server.use("/api/workers", workerRoutes);
 server.use("/api/profile", profileRoutes);
 
