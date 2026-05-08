@@ -6,8 +6,9 @@ import { protect } from "./middleware/authMiddleware.js";
 import { authorizeRoles } from "./middleware/authMiddleware.js";
 import profileRoutes from "./routes/profileRoutes.js";
 import workerRoutes from "./routes/workerRoutes.js";
-import jobRoutes from "./Routes/jobRoutes.js";
+import jobRoutes from "./routes/jobRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
+import cors from "cors";
 
 dotenv.config();
 
@@ -15,6 +16,8 @@ const server = express();
 
 // Middleware
 server.use(express.json());
+
+server.use(cors());
 
 // Routes
 server.use("/api/auth", registerRoutes);
