@@ -1,33 +1,41 @@
 import { useContext, useState } from "react";
-import API from "../services/api";
-import { Authcontext } from "../context/AuthContext";
-import { useNavigate } from "react-router-dom";
+import {
+  Card,
+  Form,
+  Input,
+  Button,
+  Typography,
+  Space,
+  Divider
+} from "antd";
+
+import {
+  MailOutlined,
+  LockOutlined,
+  LoginOutlined,
+  UserAddOutlined
+} from "@ant-design/icons";
+
+import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 
-function Login() {
+import API from "../services/api";
+import { Authcontext } from "../context/AuthContext";
 
+const { Title, Text } = Typography;
+
+function Login() {
   const navigate = useNavigate();
 
   const { setUser, setToken } = useContext(Authcontext);
 
-  const [formData, setFormData] = useState({
-    email: "",
-    password: ""
-  });
+  const [loading, setLoading] = useState(false);
 
-  const handleChange = (e) => {
-    setFormData({
-      ...formData,
-      [e.target.name]: e.target.value
-    });
-  };
-
-  const handleSubmit = async (e) => {
-    e.preventDefault();
-
+  const handleSubmit = async (values) => {
     try {
+      setLoading(true);
 
-      const res = await API.post("/auth/login", formData);
+      const res = await API.post("/auth/login", values);
 
       const { token, user } = res.data.data;
 
@@ -39,45 +47,141 @@ function Login() {
 
       toast.success("Login successful");
 
-      // role-based redirect
+      // Role-based navigation
       if (user.role === "worker") {
         navigate("/worker-dashboard");
       } else {
         navigate("/client-dashboard");
       }
-
     } catch (error) {
-      toast.error(error.response.data.message);
+      toast.error(
+        error?.response?.data?.message || "Login failed"
+      );
+    } finally {
+      setLoading(false);
     }
   };
 
   return (
-    <div>
+    <div
+      style={{
+        minHeight: "100vh",
+        display: "flex",
+        justifyContent: "center",
+        alignItems: "center",
+        background:
+          "linear-gradient(135deg, #0f172a 0%, #1e293b 50%, #334155 100%)",
+        padding: "20px"
+      }}
+    >
+      <Card
+        style={{
+          width: 420,
+          borderRadius: "20px",
+          boxShadow: "0 10px 40px rgba(0,0,0,0.25)",
+          backdropFilter: "blur(10px)"
+        }}
+      >
+        <Space
+          orientation="vertical"
+          size="small"
+          style={{
+            width: "100%",
+            textAlign: "center",
+            marginBottom: "20px"
+          }}
+        >
+          <Title level={2} style={{ marginBottom: 0 }}>
+            Welcome Back
+          </Title>
 
-      <h1>Login</h1>
+          <Text type="secondary">
+            Login to continue to your account
+          </Text>
+        </Space>
 
-      <form onSubmit={handleSubmit}>
+        <Form
+          layout="vertical"
+          onFinish={handleSubmit}
+          size="large"
+        >
+          <Form.Item
+            label="Email"
+            name="email"
+            rules={[
+              {
+                required: true,
+                message: "Please enter your email"
+              },
+              {
+                type: "email",
+                message: "Enter a valid email"
+              }
+            ]}
+          >
+            <Input
+              prefix={<MailOutlined />}
+              placeholder="Enter your email"
+            />
+          </Form.Item>
 
-        <input
-          type="email"
-          name="email"
-          placeholder="Email"
-          onChange={handleChange}
-        />
+          <Form.Item
+            label="Password"
+            name="password"
+            rules={[
+              {
+                required: true,
+                message: "Please enter your password"
+              }
+            ]}
+          >
+            <Input.Password
+              prefix={<LockOutlined />}
+              placeholder="Enter your password"
+            />
+          </Form.Item>
 
-        <input
-          type="password"
-          name="password"
-          placeholder="Password"
-          onChange={handleChange}
-        />
+          <Form.Item style={{ marginTop: "10px" }}>
+            <Button
+              type="primary"
+              htmlType="submit"
+              block
+              icon={<LoginOutlined />}
+              loading={loading}
+              style={{
+                height: "45px",
+                borderRadius: "10px",
+                fontWeight: "600"
+              }}
+            >
+              Login
+            </Button>
+          </Form.Item>
+        </Form>
 
-        <button type="submit">
-          Login
-        </button>
+        <Divider />
 
-      </form>
+        <div style={{ textAlign: "center" }}>
+          <Text type="secondary">
+            Don&apos;t have an account?
+          </Text>
 
+          <br />
+
+          <Link to="/register">
+            <Button
+              type="link"
+              icon={<UserAddOutlined />}
+              style={{
+                marginTop: "8px",
+                fontWeight: "600"
+              }}
+            >
+              Create New Account
+            </Button>
+          </Link>
+        </div>
+      </Card>
     </div>
   );
 }
