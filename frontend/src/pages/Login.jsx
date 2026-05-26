@@ -20,14 +20,14 @@ import { useNavigate, Link } from "react-router-dom";
 import toast from "react-hot-toast";
 
 import API from "../services/api";
-import { Authcontext } from "../context/AuthContext";
+import { AuthContext } from "../context/AuthContext";
 
 const { Title, Text } = Typography;
 
 function Login() {
   const navigate = useNavigate();
 
-  const { setUser, setToken } = useContext(Authcontext);
+  const { setUser, setToken } = useContext(AuthContext);
 
   const [loading, setLoading] = useState(false);
 

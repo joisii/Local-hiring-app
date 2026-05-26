@@ -1,11 +1,26 @@
 import { useContext } from "react";
 import { Navigate } from "react-router-dom";
-import { Authcontext } from "../context/AuthContext";
 
-function ProtectedRoute({ children, allowedRole }) {
-  const { token, user } = useContext(Authcontext);
+import { AuthContext }
+from "../context/AuthContext";
 
-  // no token → login
+function ProtectedRoute({
+  children,
+  allowedRole
+}) {
+
+  const {
+    token,
+    user,
+    loading
+  } = useContext(AuthContext);
+
+  // wait until auth check finishes
+  if (loading) {
+    return <p>Loading...</p>;
+  }
+
+  // no token
   if (!token) {
     return <Navigate to="/" replace />;
   }
@@ -16,7 +31,10 @@ function ProtectedRoute({ children, allowedRole }) {
   }
 
   // role mismatch
-  if (allowedRole && user.role !== allowedRole) {
+  if (
+    allowedRole &&
+    user.role !== allowedRole
+  ) {
     return <Navigate to="/" replace />;
   }
 
