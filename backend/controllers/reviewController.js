@@ -63,3 +63,40 @@ export const createReview = async (req, res) => {
     });
   }
 };
+
+export const getWorkerReviews = async (req, res) => {
+  try {
+
+    const reviews = await Review.find({
+      worker: req.params.workerId
+    })
+      .populate("client", "name")
+      .sort({ createdAt: -1 });
+
+    // calculate average
+    const totalRatings = reviews.reduce(
+      (sum, review) => sum + review.rating,
+      0
+    );
+
+    const averageRating =
+      reviews.length > 0
+        ? (totalRatings / reviews.length).toFixed(1)
+        : 0;
+
+    res.status(200).json({
+      success: true,
+      data: {
+        reviews,
+        averageRating
+      },
+      message: "Worker reviews fetched"
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};

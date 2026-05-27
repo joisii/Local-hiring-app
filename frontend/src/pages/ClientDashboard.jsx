@@ -26,6 +26,8 @@ import API from "../services/api";
 import DashboardLayout
 from "../layouts/DashboardLayout";
 
+import ReviewForm from "../components/ReviewForm";
+
 import JobCard from "../components/JobCard";
 
 import toast from "react-hot-toast";
@@ -364,10 +366,18 @@ function ClientDashboard() {
               key={job._id}
             >
 
-              <JobCard
-  key={job._id}
-  job={job}
-/>
+              <div key={job._id}>
+  <JobCard job={job} />
+
+  {job.status === "completed" && (
+    <ReviewForm
+      jobId={job._id}
+      onReviewSubmitted={fetchJobs}
+    />
+  )}
+
+  <hr />
+</div>
 
             </Col>
 

@@ -5,6 +5,7 @@ import Register from "./pages/Register";
 import WorkerDashboard from "./pages/WorkerDashboard";
 import ClientDashboard from "./pages/ClientDashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
+import WorkerReviews from "./pages/WorkerReviews";
 
 
 import { Toaster } from "react-hot-toast";
@@ -44,6 +45,15 @@ function App() {
   element={
     <ProtectedRoute allowedRole="worker">
       <WorkerProfile />
+    </ProtectedRoute>
+  }
+/>
+
+<Route
+  path="/worker-reviews"
+  element={
+    <ProtectedRoute allowedRole="worker">
+      <WorkerReviews />
     </ProtectedRoute>
   }
 />
