@@ -1,7 +1,7 @@
 import User from "../models/User.js";
 
-// GET PROFILE
-export const getProfile = async (req, res) => {
+// get current user profile
+export const getMyProfile = async (req, res) => {
   try {
     const user = await User.findById(req.user.id).select("-password");
 
@@ -10,20 +10,19 @@ export const getProfile = async (req, res) => {
       data: user,
       message: "Profile fetched"
     });
-
-  } catch (error) {
+  } catch (err) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: err.message
     });
   }
 };
 
 
 // UPDATE PROFILE
-export const updateProfile = async (req, res) => {
+export const updateWorkerProfile = async (req, res) => {
   try {
-    const { name, skills, pricing, availability } = req.body;
+    const { skills, pricing, availability } = req.body;
 
     const user = await User.findById(req.user.id);
 
@@ -34,28 +33,28 @@ export const updateProfile = async (req, res) => {
       });
     }
 
-    // update common fields
-    if (name) user.name = name;
-
-    // update worker-specific fields ONLY if worker
-    if (user.role === "worker") {
-      if (skills) user.skills = skills;
-      if (pricing !== undefined) user.pricing = pricing;
-      if (availability !== undefined) user.availability = availability;
+    if (user.role !== "worker") {
+      return res.status(403).json({
+        success: false,
+        message: "Only workers can update profile"
+      });
     }
+
+    user.skills = skills || user.skills;
+    user.pricing = pricing ?? user.pricing;
+    user.availability = availability ?? user.availability;
 
     await user.save();
 
     res.status(200).json({
       success: true,
       data: user,
-      message: "Profile updated"
+      message: "Worker profile updated"
     });
-
-  } catch (error) {
+  } catch (err) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: err.message
     });
   }
 };

@@ -4,10 +4,11 @@ import mongoose from "mongoose";
 import registerRoutes from "./routes/registerRoutes.js";
 import { protect } from "./middleware/authMiddleware.js";
 import { authorizeRoles } from "./middleware/authMiddleware.js";
-import profileRoutes from "./routes/profileRoutes.js";
+import profileRoutes from "./Routes/userRoutes.js";
 import workerRoutes from "./routes/workerRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
+import userRoutes from "./routes/userRoutes.js";
 import cors from "cors";
 
 dotenv.config();
@@ -38,6 +39,7 @@ server.get("/api/client-only", protect, authorizeRoles("client"), (req, res) => 
 server.use("/api/reviews", reviewRoutes);
 server.use("/api/workers", workerRoutes);
 server.use("/api/profile", profileRoutes);
+server.use("/api/users", userRoutes);
 
 // DB connection
 const connectDB = async () => {
