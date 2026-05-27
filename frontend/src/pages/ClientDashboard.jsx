@@ -365,8 +365,9 @@ function ClientDashboard() {
             >
 
               <JobCard
-                job={job}
-              />
+  key={job._id}
+  job={job}
+/>
 
             </Col>
 

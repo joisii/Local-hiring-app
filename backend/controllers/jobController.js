@@ -37,11 +37,44 @@ export const createJob = async (req, res) => {
 export const getJobs = async (req, res) => {
   try {
 
-    const jobs = await Job.find({
-      status: "pending"
-    })
-      .populate("client", "name email")
-      .populate("worker", "name email");
+    let jobs;
+
+    // worker dashboard logic
+    if (req.user.role === "worker") {
+
+      jobs = await Job.find({
+        $or: [
+
+          // show available jobs
+          { status: "pending" },
+
+          // show jobs accepted by current worker
+          { worker: req.user.id }
+
+        ]
+      })
+        .populate("client", "name email")
+        .populate("worker", "name email");
+
+    }
+
+    // client dashboard logic
+    else if (req.user.role === "client") {
+
+      jobs = await Job.find({
+        client: req.user.id
+      })
+        .populate("client", "name email")
+        .populate("worker", "name email");
+
+    }
+
+    // fallback
+    else {
+
+      jobs = [];
+
+    }
 
     res.status(200).json({
       success: true,
@@ -58,6 +91,7 @@ export const getJobs = async (req, res) => {
 
   }
 };
+
 export const acceptJob = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);
@@ -99,28 +133,8 @@ export const acceptJob = async (req, res) => {
 export const updateJobStatus = async (req, res) => {
   try {
     const { status } = req.body;
-    const { id } = req.params;
 
-    // Validate ObjectId
-    if (!mongoose.Types.ObjectId.isValid(id)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid job ID"
-      });
-    }
-
-    // Allowed statuses
-    const allowedStatuses = ["ongoing", "completed"];
-
-    if (!allowedStatuses.includes(status)) {
-      return res.status(400).json({
-        success: false,
-        message: "Invalid status value"
-      });
-    }
-
-    // Find Job
-    const job = await Job.findById(id);
+    const job = await Job.findById(req.params.id);
 
     if (!job) {
       return res.status(404).json({
@@ -129,40 +143,27 @@ export const updateJobStatus = async (req, res) => {
       });
     }
 
-    // Only assigned worker can update
-    if (!job.worker || job.worker.toString() !== req.user.id) {
+    // only assigned worker can update
+    if (job.worker.toString() !== req.user.id) {
       return res.status(403).json({
         success: false,
-        message: "Not authorized for this job"
+        message: "Unauthorized"
       });
     }
 
-    // Workflow validation
-    // accepted -> ongoing -> completed
+    // valid transitions
+    const validTransitions = {
+      accepted: "ongoing",
+      ongoing: "completed"
+    };
 
-    if (status === "ongoing" && job.status !== "accepted") {
+    if (validTransitions[job.status] !== status) {
       return res.status(400).json({
         success: false,
-        message: "Only accepted jobs can move to ongoing"
+        message: `Cannot move from ${job.status} to ${status}`
       });
     }
 
-    if (status === "completed" && job.status !== "ongoing") {
-      return res.status(400).json({
-        success: false,
-        message: "Only ongoing jobs can move to completed"
-      });
-    }
-
-    // Prevent updating completed jobs again
-    if (job.status === "completed") {
-      return res.status(400).json({
-        success: false,
-        message: "Completed jobs cannot be updated"
-      });
-    }
-
-    // Update status
     job.status = status;
 
     await job.save();
@@ -173,10 +174,10 @@ export const updateJobStatus = async (req, res) => {
       message: `Job marked as ${status}`
     });
 
-  } catch (error) {
+  } catch (err) {
     res.status(500).json({
       success: false,
-      message: error.message
+      message: err.message
     });
   }
 };

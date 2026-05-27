@@ -124,7 +124,7 @@ function WorkerProfile() {
       >
 
         <Space
-          direction="vertical"
+          orientation="vertical"
           size="small"
           style={{
             width: "100%",

@@ -1,94 +1,96 @@
 import {
   Card,
   Typography,
-  Button,
   Tag,
+  Button,
   Space,
-  Divider,
-  Avatar
+  Divider
 } from "antd";
 
 import {
-  CheckCircleOutlined,
   UserOutlined,
   MailOutlined,
-  DollarOutlined
+  CheckCircleOutlined,
+  PlayCircleOutlined
 } from "@ant-design/icons";
 
-const { Title, Text, Paragraph } =
-  Typography;
+const { Title, Text, Paragraph } = Typography;
 
 function JobCard({
   job,
-  onAccept
+  onAccept,
+  onStatusUpdate,
+  currentUser
 }) {
 
-  return (
+  // status color
+  const getStatusColor = (status) => {
+    switch (status) {
+      case "pending":
+        return "orange";
 
+      case "accepted":
+        return "blue";
+
+      case "ongoing":
+        return "purple";
+
+      case "completed":
+        return "green";
+
+      default:
+        return "default";
+    }
+  };
+
+  return (
     <Card
       hoverable
-
       style={{
-        borderRadius: "16px",
-        height: "100%",
-        boxShadow:
-          "0 4px 12px rgba(0,0,0,0.08)"
+        marginBottom: "20px",
+        borderRadius: "12px"
       }}
     >
 
-      {/* Job Title */}
-      <Title
-        level={4}
-        style={{
-          marginBottom: "10px"
-        }}
-      >
+      {/* title */}
+      <Title level={4}>
         {job.title}
       </Title>
 
-      {/* Description */}
-      <Paragraph
-        type="secondary"
-      >
+      {/* description */}
+      <Paragraph type="secondary">
         {job.description}
       </Paragraph>
 
-      {/* Budget */}
-      <Space
-        style={{
-          marginBottom: "12px"
-        }}
-      >
+      <Divider />
 
-        <DollarOutlined />
+      {/* budget */}
+      <Text strong>
+        Budget:
+      </Text>
 
-        <Text strong>
-          Budget:
-        </Text>
-
-        <Text>
-          ₹{job.budget}
-        </Text>
-
-      </Space>
+      <Text style={{ marginLeft: "8px" }}>
+        ₹{job.budget}
+      </Text>
 
       <br />
+      <br />
 
-      {/* Status */}
+      {/* status */}
+      <Text strong>
+        Status:
+      </Text>
+
       <Tag
-        color={
-          job.status === "pending"
-            ? "orange"
-            : "green"
-        }
+        color={getStatusColor(job.status)}
+        style={{ marginLeft: "10px" }}
       >
         {job.status.toUpperCase()}
       </Tag>
 
-      {/* Worker Details */}
+      {/* worker details */}
       {job.worker && (
         <>
-
           <Divider />
 
           <Space
@@ -96,71 +98,78 @@ function JobCard({
             size="small"
           >
 
-            <Space>
+            <Text>
+              <UserOutlined />{" "}
+              <strong>Accepted By:</strong>{" "}
+              {job.worker.name}
+            </Text>
 
-              <Avatar
-                icon={<UserOutlined />}
-              />
-
-              <div>
-
-                <Text strong>
-                  Accepted By
-                </Text>
-
-                <br />
-
-                <Text>
-                  {job.worker.name}
-                </Text>
-
-              </div>
-
-            </Space>
-
-            <Space>
-
-              <MailOutlined />
-
-              <Text>
-                {job.worker.email}
-              </Text>
-
-            </Space>
+            <Text>
+              <MailOutlined />{" "}
+              <strong>Email:</strong>{" "}
+              {job.worker.email}
+            </Text>
 
           </Space>
-
         </>
       )}
 
-      {/* Accept Button */}
-      {onAccept &&
-        job.status === "pending" && (
+      <Divider />
 
-        <Button
-          type="primary"
+      {/* buttons */}
+      <Space>
 
-          icon={
-            <CheckCircleOutlined />
-          }
+        {/* accept job */}
+        {onAccept &&
+          job.status === "pending" && (
+            <Button
+              type="primary"
+              onClick={() =>
+                onAccept(job._id)
+              }
+            >
+              Accept Job
+            </Button>
+          )}
 
-          onClick={() =>
-            onAccept(job._id)
-          }
+        {/* start job */}
+        {currentUser?.role === "worker" &&
+          job.status === "accepted" && (
+            <Button
+              type="default"
+              icon={<PlayCircleOutlined />}
+              onClick={() =>
+                onStatusUpdate(
+                  job._id,
+                  "ongoing"
+                )
+              }
+            >
+              Start Job
+            </Button>
+          )}
 
-          style={{
-            marginTop: "20px"
-          }}
+        {/* complete job */}
+        {currentUser?.role === "worker" &&
+          job.status === "ongoing" && (
+            <Button
+              type="primary"
+              success="true"
+              icon={<CheckCircleOutlined />}
+              onClick={() =>
+                onStatusUpdate(
+                  job._id,
+                  "completed"
+                )
+              }
+            >
+              Complete Job
+            </Button>
+          )}
 
-          block
-        >
-          Accept Job
-        </Button>
-
-      )}
+      </Space>
 
     </Card>
-
   );
 }
 

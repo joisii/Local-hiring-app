@@ -4,13 +4,15 @@ import { useNavigate } from "react-router-dom";
 import API from "../services/api";
 import DashboardLayout from "../layouts/DashboardLayout";
 import JobCard from "../components/JobCard";
+import { useContext } from "react";
+import { AuthContext } from "../context/AuthContext";
 
 import toast from "react-hot-toast";
 
 function WorkerDashboard() {
 
   const navigate = useNavigate();
-
+const { user } = useContext(AuthContext);
   const [jobs, setJobs] = useState([]);
   const [loading, setLoading] = useState(true);
 
@@ -57,6 +59,24 @@ function WorkerDashboard() {
     }
   };
 
+  const handleStatusUpdate = async (jobId, status) => {
+  try {
+
+    await API.put(`/jobs/${jobId}/status`, {
+      status
+    });
+
+    toast.success(`Job marked as ${status}`);
+
+    fetchJobs();
+
+  } catch (error) {
+    toast.error(
+      error.response?.data?.message || "Update failed"
+    );
+  }
+};
+
   useEffect(() => {
     fetchJobs();
   }, []);
@@ -91,10 +111,12 @@ function WorkerDashboard() {
 
         jobs.map((job) => (
           <JobCard
-            key={job._id}
-            job={job}
-            onAccept={handleAcceptJob}
-          />
+  key={job._id}
+  job={job}
+  onAccept={handleAcceptJob}
+  onStatusUpdate={handleStatusUpdate}
+  currentUser={user}
+/>
         ))
 
       )}
