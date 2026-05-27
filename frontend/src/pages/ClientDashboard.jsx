@@ -1,46 +1,111 @@
 import { useEffect, useState } from "react";
+
+import {
+  Row,
+  Col,
+  Card,
+  Form,
+  Input,
+  InputNumber,
+  Button,
+  Typography,
+  Spin,
+  Empty,
+  Divider,
+  Space
+} from "antd";
+
+import {
+  PlusOutlined,
+  ReloadOutlined,
+  FileTextOutlined
+} from "@ant-design/icons";
+
 import API from "../services/api";
-import DashboardLayout from "../layouts/DashboardLayout";
+
+import DashboardLayout
+from "../layouts/DashboardLayout";
+
 import JobCard from "../components/JobCard";
+
 import toast from "react-hot-toast";
 
+const { Title, Text } = Typography;
+const { TextArea } = Input;
+
 function ClientDashboard() {
+
   const [jobs, setJobs] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  const [formData, setFormData] = useState({
-    title: "",
-    description: "",
-    budget: ""
-  });
+  const [loading, setLoading] =
+    useState(true);
 
+  const [posting, setPosting] =
+    useState(false);
+
+  const [formData, setFormData] =
+    useState({
+      title: "",
+      description: "",
+      budget: ""
+    });
+
+  // Fetch Jobs
   const fetchJobs = async () => {
+
     try {
-      const res = await API.get("jobs/client/my-jobs");
+
+      setLoading(true);
+
+      const res =
+        await API.get(
+          "jobs/client/my-jobs"
+        );
+
       setJobs(res.data.data);
+
     } catch (error) {
+
       toast.error(
-        error.response?.data?.message || "Failed to fetch jobs"
+        error.response?.data?.message
+        || "Failed to fetch jobs"
       );
+
     } finally {
+
       setLoading(false);
+
     }
   };
 
-  const handleChange = (e) => {
+  // Handle Input
+  const handleChange = (
+    name,
+    value
+  ) => {
+
     setFormData({
       ...formData,
-      [e.target.name]: e.target.value
+      [name]: value
     });
+
   };
 
-  const handleSubmit = async (e) => {
-    e.preventDefault();
+  // Submit Job
+  const handleSubmit = async () => {
 
     try {
-      await API.post("/jobs", formData);
 
-      toast.success("Job posted");
+      setPosting(true);
+
+      await API.post(
+        "/jobs",
+        formData
+      );
+
+      toast.success(
+        "Job posted successfully"
+      );
 
       setFormData({
         title: "",
@@ -49,10 +114,18 @@ function ClientDashboard() {
       });
 
       fetchJobs();
+
     } catch (error) {
+
       toast.error(
-        error.response?.data?.message || "Posting failed"
+        error.response?.data?.message
+        || "Posting failed"
       );
+
+    } finally {
+
+      setPosting(false);
+
     }
   };
 
@@ -61,51 +134,250 @@ function ClientDashboard() {
   }, []);
 
   return (
-    <DashboardLayout title="Client Dashboard">
-      <h2>Post Job</h2>
 
-      <form onSubmit={handleSubmit}>
-        <input
-          type="text"
-          name="title"
-          placeholder="Title"
-          value={formData.title}
-          onChange={handleChange}
-        />
+    <DashboardLayout
+      title="Client Dashboard"
+    >
 
-        <input
-          type="text"
-          name="description"
-          placeholder="Description"
-          value={formData.description}
-          onChange={handleChange}
-        />
+      {/* Post Job Card */}
+      <Card
+        style={{
+          marginBottom: "30px",
+          borderRadius: "16px",
+          boxShadow:
+            "0 4px 12px rgba(0,0,0,0.08)"
+        }}
+      >
 
-        <input
-          type="number"
-          name="budget"
-          placeholder="Budget"
-          value={formData.budget}
-          onChange={handleChange}
-        />
+        <Space
+          orientation="vertical"
+          size="small"
+          style={{
+            marginBottom: "20px"
+          }}
+        >
 
-        <button type="submit">Post Job</button>
-      </form>
+          <Title
+            level={3}
+            style={{
+              marginBottom: 0
+            }}
+          >
+            Post a New Job
+          </Title>
 
-      <hr />
+          <Text type="secondary">
+            Create job listings for workers
+          </Text>
 
-      <h2>My Jobs</h2>
+        </Space>
 
+        <Form
+          layout="vertical"
+          onFinish={handleSubmit}
+        >
+
+          {/* Title */}
+          <Form.Item
+            label="Job Title"
+            required
+          >
+
+            <Input
+              placeholder="Enter job title"
+
+              value={formData.title}
+
+              onChange={(e) =>
+                handleChange(
+                  "title",
+                  e.target.value
+                )
+              }
+            />
+
+          </Form.Item>
+
+          {/* Description */}
+          <Form.Item
+            label="Description"
+            required
+          >
+
+            <TextArea
+              rows={4}
+
+              placeholder="Describe the job"
+
+              value={
+                formData.description
+              }
+
+              onChange={(e) =>
+                handleChange(
+                  "description",
+                  e.target.value
+                )
+              }
+            />
+
+          </Form.Item>
+
+          {/* Budget */}
+          <Form.Item
+            label="Budget (₹)"
+            required
+          >
+
+            <InputNumber
+              style={{
+                width: "100%"
+              }}
+
+              placeholder="Enter budget"
+
+              value={formData.budget}
+
+              onChange={(value) =>
+                handleChange(
+                  "budget",
+                  value
+                )
+              }
+            />
+
+          </Form.Item>
+
+          {/* Submit */}
+          <Form.Item>
+
+            <Button
+              type="primary"
+
+              htmlType="submit"
+
+              icon={<PlusOutlined />}
+
+              loading={posting}
+
+              size="large"
+            >
+              Post Job
+            </Button>
+
+          </Form.Item>
+
+        </Form>
+
+      </Card>
+
+      {/* Jobs Section */}
+      <Divider />
+
+      <Row
+        justify="space-between"
+        align="middle"
+        style={{
+          marginBottom: "20px"
+        }}
+      >
+
+        <Col>
+
+          <Space
+            align="center"
+          >
+
+            <FileTextOutlined
+              style={{
+                fontSize: "22px"
+              }}
+            />
+
+            <Title
+              level={3}
+              style={{
+                margin: 0
+              }}
+            >
+              My Jobs
+            </Title>
+
+          </Space>
+
+        </Col>
+
+        <Col>
+
+          <Button
+            icon={<ReloadOutlined />}
+
+            onClick={fetchJobs}
+          >
+            Refresh
+          </Button>
+
+        </Col>
+
+      </Row>
+
+      {/* Loading */}
       {loading ? (
-        <p>Loading jobs...</p>
+
+        <div
+          style={{
+            display: "flex",
+            justifyContent: "center",
+            marginTop: "60px"
+          }}
+        >
+
+          <Spin size="large" />
+
+        </div>
+
       ) : jobs.length === 0 ? (
-        <p>No jobs found</p>
+
+        <Card
+          style={{
+            borderRadius: "16px"
+          }}
+        >
+
+          <Empty
+            description="No jobs found"
+          />
+
+        </Card>
+
       ) : (
-        jobs.map((job) => (
-          <JobCard key={job._id} job={job} />
-        ))
+
+        <Row gutter={[20, 20]}>
+
+          {jobs.map((job) => (
+
+            <Col
+              xs={24}
+              md={12}
+              lg={8}
+
+              key={job._id}
+            >
+
+              <JobCard
+                job={job}
+              />
+
+            </Col>
+
+          ))}
+
+        </Row>
+
       )}
+
     </DashboardLayout>
+
   );
 }
 

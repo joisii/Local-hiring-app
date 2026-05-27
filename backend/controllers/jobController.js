@@ -36,7 +36,12 @@ export const createJob = async (req, res) => {
 
 export const getJobs = async (req, res) => {
   try {
-    const jobs = await Job.find({ status: "pending" }).populate("client", "name email");
+
+    const jobs = await Job.find({
+      status: "pending"
+    })
+      .populate("client", "name email")
+      .populate("worker", "name email");
 
     res.status(200).json({
       success: true,
@@ -45,13 +50,14 @@ export const getJobs = async (req, res) => {
     });
 
   } catch (error) {
+
     res.status(500).json({
       success: false,
       message: error.message
     });
+
   }
 };
-
 export const acceptJob = async (req, res) => {
   try {
     const job = await Job.findById(req.params.id);

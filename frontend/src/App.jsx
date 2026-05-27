@@ -1,5 +1,5 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
-
+import WorkerProfile from "./pages/WorkerProfile";
 import Login from "./pages/Login";
 import Register from "./pages/Register";
 import WorkerDashboard from "./pages/WorkerDashboard";
@@ -38,6 +38,15 @@ function App() {
             </ProtectedRoute>
           }
         />
+        
+  <Route
+  path="/worker-profile"
+  element={
+    <ProtectedRoute allowedRole="worker">
+      <WorkerProfile />
+    </ProtectedRoute>
+  }
+/>
 
       </Routes>
 
