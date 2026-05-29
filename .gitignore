@@ -1,3 +1,4 @@
-node_modules/
-# ignore all env files anywhere
+node_modules
+frontend/.vite
+dist
 .env
