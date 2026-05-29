@@ -1,107 +1,78 @@
 import axios from "axios";
 
+/* =========================
+   BASE AXIOS INSTANCE
+   ========================= */
+
 const API = axios.create({
-
-  baseURL: "https://local-hiring-app.onrender.com/",
-
-  withCredentials: true
+  baseURL: import.meta.env.VITE_API_URL,
+  withCredentials: true,
 });
 
-/* ---------------- REQUEST INTERCEPTOR ---------------- */
+/* =========================
+   REQUEST INTERCEPTOR
+   ========================= */
 
 API.interceptors.request.use(
-
   (config) => {
-
-    const token =
-      localStorage.getItem(
-        "accessToken"
-      );
+    const token = localStorage.getItem("accessToken");
 
     if (token) {
-
-      config.headers.Authorization =
-        `Bearer ${token}`;
+      config.headers.Authorization = `Bearer ${token}`;
     }
 
     return config;
   },
-
   (error) => {
-
     return Promise.reject(error);
   }
 );
 
-/* ---------------- RESPONSE INTERCEPTOR ---------------- */
+/* =========================
+   RESPONSE INTERCEPTOR
+   ========================= */
 
 API.interceptors.response.use(
-
   (response) => response,
-
   async (error) => {
+    const originalRequest = error.config;
 
-    const originalRequest =
-      error.config;
-
-    // prevent infinite loop
+    // prevent infinite retry loop
     if (
       error.response?.status === 401 &&
       !originalRequest._retry
     ) {
-
       originalRequest._retry = true;
 
       try {
-
-        // refresh token request
+        // IMPORTANT: use same baseURL (NOT localhost)
         const res = await axios.post(
-
-          "http://localhost:5000/api/auth/refresh-token",
-
+          `${import.meta.env.VITE_API_URL}/auth/refresh-token`,
           {},
-
-          {
-            withCredentials: true
-          }
+          { withCredentials: true }
         );
 
-        const newAccessToken =
-          res.data.data.accessToken;
+        const newAccessToken = res.data?.data?.accessToken;
 
-        // store new token
-        localStorage.setItem(
-          "accessToken",
-          newAccessToken
-        );
+        if (!newAccessToken) {
+          throw new Error("No access token received");
+        }
 
-        // update failed request
+        localStorage.setItem("accessToken", newAccessToken);
+
         originalRequest.headers.Authorization =
           `Bearer ${newAccessToken}`;
 
-        // retry original request
         return API(originalRequest);
-
       } catch (refreshError) {
+        console.log("Refresh failed", refreshError);
 
-        console.log(
-          "Refresh failed",
-          refreshError
-        );
-
-        localStorage.removeItem(
-          "accessToken"
-        );
-
-        localStorage.removeItem(
-          "user"
-        );
+        localStorage.removeItem("accessToken");
+        localStorage.removeItem("user");
 
         window.location.href = "/";
 
-        return Promise.reject(
-          refreshError
-        );
+        return Promise.reject(refreshError);
       }
     }
 
