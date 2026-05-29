@@ -54,7 +54,7 @@ server.use(express.json());
 
 server.use(
   cors({
-    origin: "http://localhost:5173",
+    origin: "https://local-hiring-app.vercel.app/",
     credentials: true,
   })
 );
