@@ -53,10 +53,13 @@ server.get("/", (req, res) => {
 server.use(express.json());
 
 server.use(
-  cors({
-    origin: "https://local-hiring-app.vercel.app/",
-    credentials: true,
-  })
+cors({
+  origin: [
+    "http://localhost:5173",
+    "https://local-hiring-app.vercel.app"
+  ],
+  credentials: true,
+})
 );
 
 server.use(cookieParser());
