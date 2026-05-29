@@ -42,7 +42,14 @@ const server = express();
 /* ===============================
    MIDDLEWARE
    =============================== */
-
+server.get("/", (req, res) => {
+  res.status(200).json({
+    status: "OK",
+    service: "Local Hiring App API",
+    version: "1.0.0",
+    message: "Server is live and operational"
+  });
+});
 server.use(express.json());
 
 server.use(
