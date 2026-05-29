@@ -4,61 +4,132 @@ import {
   useState
 } from "react";
 
-export const AuthContext = createContext();
+import API from "../services/api";
 
-export const AuthProvider = ({ children }) => {
+export const AuthContext =
+  createContext();
 
-  const [user,setUser]=useState(()=>{
-   const savedUser = localStorage.getItem("user");
+export const AuthProvider = ({
+  children
+}) => {
 
-   return savedUser
-      ? JSON.parse(savedUser)
-      : null;
-});
+  /* ---------------- USER ---------------- */
 
-  const [token, setToken] = useState(
-    localStorage.getItem("token")
-  );
+  const [user, setUser] =
+    useState(null);
 
-  const [loading, setLoading] = useState(true);
+  /* ---------------- ACCESS TOKEN ---------------- */
+
+  const [accessToken,
+    setAccessToken] =
+    useState(null);
+
+  /* ---------------- LOADING ---------------- */
+
+  const [loading,
+    setLoading] =
+    useState(true);
+
+  /* ---------------- LOGOUT ---------------- */
 
   const logout = () => {
-    localStorage.removeItem("token");
-    localStorage.removeItem("user");
+
+    localStorage.removeItem(
+      "accessToken"
+    );
+
+    localStorage.removeItem(
+      "user"
+    );
 
     setUser(null);
-    setToken(null);
+
+    setAccessToken(null);
   };
+
+  /* ---------------- INITIAL AUTH CHECK ---------------- */
 
   useEffect(() => {
 
-    const savedUser =
-      localStorage.getItem("user");
+    const initializeAuth =
+      async () => {
 
-    const savedToken =
-      localStorage.getItem("token");
+        try {
 
-    if (savedUser && savedToken) {
-      setUser(JSON.parse(savedUser));
-      setToken(savedToken);
-    }
+          const savedUser =
+            localStorage.getItem(
+              "user"
+            );
 
-    setLoading(false);
+          if (!savedUser) {
+
+            setLoading(false);
+
+            return;
+          }
+
+          // try refreshing token automatically
+          const res =
+            await API.post(
+              "/auth/refresh-token"
+            );
+
+          const newAccessToken =
+            res.data.data.accessToken;
+
+          localStorage.setItem(
+            "accessToken",
+            newAccessToken
+          );
+
+          setAccessToken(
+            newAccessToken
+          );
+
+          setUser(
+            JSON.parse(savedUser)
+          );
+
+        } catch (err) {
+
+          console.log(
+            "Initial refresh failed",
+            err
+          );
+
+          logout();
+
+        } finally {
+
+          setLoading(false);
+        }
+      };
+
+    initializeAuth();
 
   }, []);
 
   return (
+
     <AuthContext.Provider
       value={{
+
         user,
-        token,
+
+        accessToken,
+
         loading,
+
         setUser,
-        setToken,
+
+        setAccessToken,
+
         logout
       }}
     >
+
       {children}
+
     </AuthContext.Provider>
   );
 };

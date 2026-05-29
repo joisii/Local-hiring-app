@@ -10,7 +10,7 @@ import "antd/dist/reset.css";
 import { AuthProvider } from "./context/AuthContext.jsx";
 
 ReactDOM.createRoot(document.getElementById("root")).render(
-  <React.StrictMode>
+  
     <ConfigProvider
       theme={{
         token: {
@@ -24,5 +24,4 @@ ReactDOM.createRoot(document.getElementById("root")).render(
         <App />
       </AuthProvider>
     </ConfigProvider>
-  </React.StrictMode>
 );

@@ -5,7 +5,6 @@ import Register from "./pages/Register";
 import WorkerDashboard from "./pages/WorkerDashboard";
 import ClientDashboard from "./pages/ClientDashboard";
 import ProtectedRoute from "./routes/ProtectedRoute";
-import WorkerReviews from "./pages/WorkerReviews";
 import ReviewPage from "./pages/ReviewPage";
 
 
@@ -40,6 +39,7 @@ function App() {
             </ProtectedRoute>
           }
         />
+
         
   <Route
   path="/worker-profile"
@@ -49,25 +49,14 @@ function App() {
     </ProtectedRoute>
   }
 />
-
-<Route
-  path="/worker-reviews"
-  element={
-    <ProtectedRoute allowedRole="worker">
-      <WorkerReviews />
-    </ProtectedRoute>
-  }
-/>
-
-<Route
-  path="/review/:jobId"
+ <Route
+  path="/review/:id"
   element={
     <ProtectedRoute allowedRole="client">
       <ReviewPage />
     </ProtectedRoute>
   }
 />
-
       </Routes>
 
     </BrowserRouter>
