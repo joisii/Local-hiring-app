@@ -2,6 +2,7 @@ import express from "express";
 import dotenv from "dotenv";
 import mongoose from "mongoose";
 import registerRoutes from "./routes/registerRoutes.js";
+import cookieParser from "cookie-parser";
 import { protect } from "./middleware/authMiddleware.js";
 import { authorizeRoles } from "./middleware/authMiddleware.js";
 import profileRoutes from "./Routes/userRoutes.js";
@@ -18,7 +19,14 @@ const server = express();
 // Middleware
 server.use(express.json());
 
-server.use(cors());
+server.use(cors({
+
+    origin: "http://localhost:5173",
+
+    credentials: true
+
+  }));
+server.use(cookieParser());
 
 // Routes
 server.use("/api/auth", registerRoutes);

@@ -10,7 +10,7 @@ function ProtectedRoute({
 }) {
 
   const {
-    token,
+    accessToken,
     user,
     loading
   } = useContext(AuthContext);
@@ -21,7 +21,7 @@ function ProtectedRoute({
   }
 
   // no token
-  if (!token) {
+  if (!accessToken) {
     return <Navigate to="/" replace />;
   }
 

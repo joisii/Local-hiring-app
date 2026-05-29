@@ -12,29 +12,29 @@ import {
   Spin,
   Empty,
   Divider,
-  Space
+  Space,
+  Flex
 } from "antd";
 
 import {
   PlusOutlined,
   ReloadOutlined,
-  FileTextOutlined
+  FileTextOutlined,
+  AppstoreOutlined
 } from "@ant-design/icons";
 
 import API from "../services/api";
 
-import DashboardLayout
-from "../layouts/DashboardLayout";
+import DashboardLayout from "../layouts/DashboardLayout";
 
 import ReviewForm from "../components/ReviewForm";
-
 import JobCard from "../components/JobCard";
 
 import toast from "react-hot-toast";
 
 import { Link } from "react-router-dom";
 
-const { Title, Text } = Typography;
+const { Title, Text, Paragraph } = Typography;
 const { TextArea } = Input;
 
 function ClientDashboard() {
@@ -55,52 +55,52 @@ function ClientDashboard() {
     });
 
   // Fetch Jobs
-const fetchJobs = async () => {
+  const fetchJobs = async () => {
 
-  try {
+    try {
 
-    setLoading(true);
+      setLoading(true);
 
-    const res =
-      await API.get(
-        "/jobs/client/my-jobs"
+      const res =
+        await API.get(
+          "/jobs/client/my-jobs"
+        );
+
+      // attach reviews to every job
+      const jobsWithReviews =
+        await Promise.all(
+
+          res.data.data.map(
+            async (job) => {
+
+              const reviewRes =
+                await API.get(
+                  `/reviews/job/${job._id}`
+                );
+
+              return {
+                ...job,
+                review: reviewRes.data.data
+              };
+            }
+          )
+        );
+
+      setJobs(jobsWithReviews);
+
+    } catch (error) {
+
+      toast.error(
+        error.response?.data?.message
+        || "Failed to fetch jobs"
       );
 
-    // attach reviews to every job
-    const jobsWithReviews =
-      await Promise.all(
+    } finally {
 
-        res.data.data.map(
-          async (job) => {
+      setLoading(false);
 
-           const reviewRes =
-  await API.get(
-    `/reviews/job/${job._id}`
-  );
-
-return {
-  ...job,
-  review: reviewRes.data.data
-};
-          }
-        )
-      );
-
-    setJobs(jobsWithReviews);
-
-  } catch (error) {
-
-    toast.error(
-      error.response?.data?.message
-      || "Failed to fetch jobs"
-    );
-
-  } finally {
-
-    setLoading(false);
-
-  }
-};
+    }
+  };
 
   // Handle Input
   const handleChange = (
@@ -163,35 +163,128 @@ return {
       title="Client Dashboard"
     >
 
-      {/* Post Job Card */}
+      {/* HERO SECTION */}
       <Card
+        variant={false}
         style={{
           marginBottom: "30px",
-          borderRadius: "16px",
+          borderRadius: "24px",
+          background:
+            "linear-gradient(135deg, #1677ff 0%, #4096ff 100%)",
+          color: "#fff",
+          overflow: "hidden"
+        }}
+      >
+
+        <Flex
+          justify="space-between"
+          align="center"
+          wrap="wrap"
+          gap={20}
+        >
+
+          <div>
+
+            <Space
+              orientation="vertical"
+              size={6}
+            >
+
+              <Title
+                level={2}
+                style={{
+                  color: "#fff",
+                  margin: 0
+                }}
+              >
+                Welcome Back 👋
+              </Title>
+
+              <Text
+                style={{
+                  color: "rgba(255,255,255,0.85)",
+                  fontSize: "15px"
+                }}
+              >
+                Manage jobs, monitor workers,
+                and grow your hiring workflow.
+              </Text>
+
+            </Space>
+
+          </div>
+
+          <Card
+            style={{
+              borderRadius: "18px",
+              minWidth: "180px",
+              textAlign: "center",
+              border: "none"
+            }}
+          >
+
+            <Space orientation="vertical">
+
+              <AppstoreOutlined
+                style={{
+                  fontSize: "28px",
+                  color: "#1677ff"
+                }}
+              />
+
+              <Title
+                level={3}
+                style={{
+                  margin: 0
+                }}
+              >
+                {jobs.length}
+              </Title>
+
+              <Text type="secondary">
+                Total Jobs
+              </Text>
+
+            </Space>
+
+          </Card>
+
+        </Flex>
+
+      </Card>
+
+      {/* POST JOB FORM */}
+      <Card
+        variant={false}
+        style={{
+          marginBottom: "35px",
+          borderRadius: "22px",
           boxShadow:
-            "0 4px 12px rgba(0,0,0,0.08)"
+            "0 6px 20px rgba(0,0,0,0.06)"
         }}
       >
 
         <Space
           orientation="vertical"
-          size="small"
+          size={4}
           style={{
-            marginBottom: "20px"
+            marginBottom: "25px"
           }}
         >
 
           <Title
             level={3}
             style={{
-              marginBottom: 0
+              margin: 0
             }}
           >
             Post a New Job
           </Title>
 
           <Text type="secondary">
-            Create job listings for workers
+            Fill in the details carefully.
+            Workers can only save you if
+            your requirements make sense.
           </Text>
 
         </Space>
@@ -201,202 +294,295 @@ return {
           onFinish={handleSubmit}
         >
 
-          {/* Title */}
-          <Form.Item
-            label="Job Title"
-            required
-          >
+          <Row gutter={[20, 0]}>
 
-            <Input
-              placeholder="Enter job title"
+            {/* Job Title */}
+            <Col xs={24}>
 
-              value={formData.title}
+              <Form.Item
+                label="Job Title"
+                required
+              >
 
-              onChange={(e) =>
-                handleChange(
-                  "title",
-                  e.target.value
-                )
-              }
-            />
+                <Input
+                  size="large"
 
-          </Form.Item>
+                  placeholder="Enter job title"
 
-          {/* Description */}
-          <Form.Item
-            label="Description"
-            required
-          >
+                  value={formData.title}
 
-            <TextArea
-              rows={4}
+                  onChange={(e) =>
+                    handleChange(
+                      "title",
+                      e.target.value
+                    )
+                  }
+                />
 
-              placeholder="Describe the job"
+              </Form.Item>
 
-              value={
-                formData.description
-              }
+            </Col>
 
-              onChange={(e) =>
-                handleChange(
-                  "description",
-                  e.target.value
-                )
-              }
-            />
+            {/* Description */}
+            <Col xs={24}>
 
-          </Form.Item>
+              <Form.Item
+                label="Description"
+                required
+              >
 
-          {/* Budget */}
-          <Form.Item
-            label="Budget (₹)"
-            required
-          >
+                <TextArea
+                  rows={5}
 
-            <InputNumber
+                  placeholder="Describe the job clearly"
+
+                  value={
+                    formData.description
+                  }
+
+                  onChange={(e) =>
+                    handleChange(
+                      "description",
+                      e.target.value
+                    )
+                  }
+
+                  style={{
+                    resize: "none"
+                  }}
+                />
+
+              </Form.Item>
+
+            </Col>
+
+            {/* Budget */}
+            <Col xs={24} md={12}>
+
+              <Form.Item
+                label="Budget (₹)"
+                required
+              >
+
+                <InputNumber
+                  size="large"
+
+                  style={{
+                    width: "100%"
+                  }}
+
+                  placeholder="Enter budget"
+
+                  min={1}
+
+                  value={formData.budget}
+
+                  onChange={(value) =>
+                    handleChange(
+                      "budget",
+                      value
+                    )
+                  }
+                />
+
+              </Form.Item>
+
+            </Col>
+
+            {/* Submit */}
+            <Col
+              xs={24}
+              md={12}
               style={{
-                width: "100%"
+                display: "flex",
+                alignItems: "end"
               }}
-
-              placeholder="Enter budget"
-
-              value={formData.budget}
-
-              onChange={(value) =>
-                handleChange(
-                  "budget",
-                  value
-                )
-              }
-            />
-
-          </Form.Item>
-
-          {/* Submit */}
-          <Form.Item>
-
-            <Button
-              type="primary"
-
-              htmlType="submit"
-
-              icon={<PlusOutlined />}
-
-              loading={posting}
-
-              size="large"
             >
-              Post Job
-            </Button>
 
-          </Form.Item>
+              <Form.Item
+                style={{
+                  width: "100%"
+                }}
+              >
+
+                <Button
+                  type="primary"
+
+                  htmlType="submit"
+
+                  icon={<PlusOutlined />}
+
+                  loading={posting}
+
+                  size="large"
+
+                  block
+
+                  style={{
+                    height: "48px",
+                    borderRadius: "12px",
+                    fontWeight: "600"
+                  }}
+                >
+                  Post Job
+                </Button>
+
+              </Form.Item>
+
+            </Col>
+
+          </Row>
 
         </Form>
 
       </Card>
 
-      {/* Jobs Section */}
-      <Divider />
-
+      {/* JOB HEADER */}
       <Row
         justify="space-between"
         align="middle"
+        gutter={[16, 16]}
         style={{
-          marginBottom: "20px"
+          marginBottom: "24px"
         }}
       >
 
-        <Col>
+        <Col xs={24} md={12}>
 
-          <Space
-            align="center"
-          >
+          <Space align="center">
 
-            <FileTextOutlined
+            <div
               style={{
-                fontSize: "22px"
-              }}
-            />
-
-            <Title
-              level={3}
-              style={{
-                margin: 0
+                width: "45px",
+                height: "45px",
+                borderRadius: "12px",
+                background: "#1677ff",
+                display: "flex",
+                justifyContent: "center",
+                alignItems: "center"
               }}
             >
-              My Jobs
-            </Title>
+
+              <FileTextOutlined
+                style={{
+                  fontSize: "22px",
+                  color: "#fff"
+                }}
+              />
+
+            </div>
+
+            <div>
+
+              <Title
+                level={3}
+                style={{
+                  margin: 0
+                }}
+              >
+                My Jobs
+              </Title>
+
+              <Text type="secondary">
+                Track and manage all jobs
+              </Text>
+
+            </div>
 
           </Space>
 
         </Col>
 
-        <Col>
+        <Col xs={24} md={12}>
 
-          <Button
-            icon={<ReloadOutlined />}
-
-            onClick={fetchJobs}
+          <Flex
+            justify="flex-end"
           >
-            Refresh
-          </Button>
+
+            <Button
+              icon={<ReloadOutlined />}
+              onClick={fetchJobs}
+              size="large"
+              style={{
+                borderRadius: "12px"
+              }}
+            >
+              Refresh
+            </Button>
+
+          </Flex>
 
         </Col>
 
       </Row>
 
-      {/* Loading */}
+      {/* LOADING */}
       {loading ? (
 
-        <div
+        <Card
+          variant={false}
           style={{
-            display: "flex",
-            justifyContent: "center",
-            marginTop: "60px"
+            borderRadius: "20px",
+            padding: "50px",
+            textAlign: "center"
           }}
         >
 
           <Spin size="large" />
 
-        </div>
+          <Paragraph
+            type="secondary"
+            style={{
+              marginTop: "18px"
+            }}
+          >
+            Loading jobs...
+          </Paragraph>
+
+        </Card>
 
       ) : jobs.length === 0 ? (
 
         <Card
+          bordered={false}
           style={{
-            borderRadius: "16px"
+            borderRadius: "20px",
+            padding: "40px"
           }}
         >
 
           <Empty
-            description="No jobs found"
+            description="No jobs found yet"
           />
 
         </Card>
 
       ) : (
 
-        <Row gutter={[20, 20]}>
+        <Row gutter={[24, 24]}>
 
           {jobs.map((job) => (
 
             <Col
               xs={24}
+              sm={24}
               md={12}
-              lg={8}
-
+              xl={8}
               key={job._id}
             >
 
-              <div key={job._id}>
+              <div
+                style={{
+                  transition: "0.3s"
+                }}
+              >
 
-<JobCard
-  job={job}
-  showReviewButton={true}
-/>
+                <JobCard
+                  job={job}
+                  showReviewButton={true}
+                />
 
-  <hr />
-</div>
+              </div>
 
             </Col>
 

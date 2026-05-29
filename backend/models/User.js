@@ -32,7 +32,11 @@ const userSchema = new mongoose.Schema({
   availability: {
     type: Boolean,
     default: true
-  }
+  },
+  refreshToken:{
+  type:String,
+  default:null
+}
 
 }, {timestamps:true});
  
