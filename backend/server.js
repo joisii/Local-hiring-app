@@ -5,7 +5,7 @@ import registerRoutes from "./routes/registerRoutes.js";
 import cookieParser from "cookie-parser";
 import { protect } from "./middleware/authMiddleware.js";
 import { authorizeRoles } from "./middleware/authMiddleware.js";
-import profileRoutes from "./Routes/userRoutes.js";
+import profileRoutes from "./routes/userRoutes.js";
 import workerRoutes from "./routes/workerRoutes.js";
 import jobRoutes from "./routes/jobRoutes.js";
 import reviewRoutes from "./routes/reviewRoutes.js";
