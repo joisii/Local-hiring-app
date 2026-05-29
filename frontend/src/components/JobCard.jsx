@@ -11,8 +11,11 @@ import {
   UserOutlined,
   MailOutlined,
   CheckCircleOutlined,
-  PlayCircleOutlined
+  PlayCircleOutlined,
+  StarOutlined
 } from "@ant-design/icons";
+
+import { Link } from "react-router-dom";
 
 const { Title, Text, Paragraph } = Typography;
 
@@ -20,12 +23,15 @@ function JobCard({
   job,
   onAccept,
   onStatusUpdate,
-  currentUser
+  currentUser,
+  showReviewButton = false
 }) {
 
   // status color
   const getStatusColor = (status) => {
+
     switch (status) {
+
       case "pending":
         return "orange";
 
@@ -44,6 +50,7 @@ function JobCard({
   };
 
   return (
+
     <Card
       hoverable
       style={{
@@ -114,10 +121,43 @@ function JobCard({
         </>
       )}
 
+      {/* review display */}
+      {job.review && (
+        <>
+          <Divider />
+
+          <div
+            style={{
+              padding: "12px",
+              border: "1px solid #d9f7be",
+              background: "#f6ffed",
+              borderRadius: "8px"
+            }}
+          >
+
+            <Text strong>
+              ⭐ {job.review.rating}/5
+            </Text>
+
+            <br />
+            <br />
+
+            <Paragraph italic>
+              "{job.review.comment}"
+            </Paragraph>
+
+            <Text type="secondary">
+              — {job.review.client?.name}
+            </Text>
+
+          </div>
+        </>
+      )}
+
       <Divider />
 
       {/* buttons */}
-      <Space>
+      <Space wrap>
 
         {/* accept job */}
         {onAccept &&
@@ -154,7 +194,6 @@ function JobCard({
           job.status === "ongoing" && (
             <Button
               type="primary"
-              success="true"
               icon={<CheckCircleOutlined />}
               onClick={() =>
                 onStatusUpdate(
@@ -166,6 +205,33 @@ function JobCard({
               Complete Job
             </Button>
           )}
+
+ {showReviewButton &&
+  job.status === "completed" && (
+
+    job.review ? (
+
+      <Button
+        disabled
+        icon={<StarOutlined />}
+      >
+        Review Submitted
+      </Button>
+
+    ) : (
+
+      <Link to={`/review/${job._id}`}>
+
+        <Button
+          type="dashed"
+          icon={<StarOutlined />}
+        >
+          Give Review
+        </Button>
+
+      </Link>
+    )
+)}
 
       </Space>
 

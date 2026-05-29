@@ -23,7 +23,32 @@ const { user } = useContext(AuthContext);
 
       const res = await API.get("/jobs");
 
-      setJobs(res.data.data);
+const jobsWithReviews = await Promise.all(
+
+  res.data.data.map(async (job) => {
+
+    try {
+
+      const reviewRes = await API.get(
+        `/reviews/job/${job._id}`
+      );
+
+      return {
+        ...job,
+        review: reviewRes.data.data
+      };
+
+    } catch {
+
+      return {
+        ...job,
+        review: null
+      };
+    }
+  })
+);
+
+setJobs(jobsWithReviews);
 
     } catch (error) {
 
@@ -110,13 +135,16 @@ const { user } = useContext(AuthContext);
       ) : (
 
         jobs.map((job) => (
-          <JobCard
+
+         <JobCard
   key={job._id}
   job={job}
   onAccept={handleAcceptJob}
   onStatusUpdate={handleStatusUpdate}
   currentUser={user}
+  showReviewButton={false}
 />
+
         ))
 
       )}
