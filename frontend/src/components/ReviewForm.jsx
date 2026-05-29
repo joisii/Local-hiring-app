@@ -47,9 +47,9 @@ function ReviewForm({
         formData
       );
 
-      toast.success(
-        "Review submitted"
-      );
+     toast.success(
+  "Review submitted successfully"
+);
 
       setFormData({
         rating: 5,
@@ -117,9 +117,18 @@ function ReviewForm({
         <Form.Item
           label="Rating"
         >
+<Rate
+  allowClear={false}
 
-          <Rate
-            value={formData.rating}
+  tooltips={[
+    "Terrible",
+    "Bad",
+    "Average",
+    "Good",
+    "Excellent"
+  ]}
+
+  value={formData.rating}
 
             onChange={(value) =>
               setFormData({
@@ -133,25 +142,36 @@ function ReviewForm({
 
         {/* Comment */}
         <Form.Item
-          label="Review Comment"
-        >
+  label="Review Comment"
+  rules={[
+    {
+      required: true,
+      message:
+        "Please enter a review"
+    }
+  ]}
+>
 
-          <TextArea
-            rows={4}
+         <TextArea
+  rows={5}
 
-            placeholder="Write your review here..."
+  maxLength={300}
 
-            prefix={<MessageOutlined />}
+  showCount
 
-            value={formData.comment}
+  placeholder="
+    Describe your experience
+  "
 
-            onChange={(e) =>
-              setFormData({
-                ...formData,
-                comment: e.target.value
-              })
-            }
-          />
+  value={formData.comment}
+
+  onChange={(e) =>
+    setFormData({
+      ...formData,
+      comment: e.target.value
+    })
+  }
+/>
 
         </Form.Item>
 

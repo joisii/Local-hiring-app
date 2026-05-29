@@ -100,3 +100,35 @@ export const getWorkerReviews = async (req, res) => {
     });
   }
 };
+
+export const getReviewByJob = async (req, res) => {
+  try {
+
+    const review = await Review.findOne({
+      job: req.params.jobId
+    })
+      .populate("client", "name")
+      .populate("worker", "name");
+
+    if (!review) {
+
+  return res.status(200).json({
+    success: true,
+    data: null,
+    message: "No review yet"
+  });
+}
+
+    res.status(200).json({
+      success: true,
+      data: review,
+      message: "Review fetched"
+    });
+
+  } catch (error) {
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+  }
+};

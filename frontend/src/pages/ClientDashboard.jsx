@@ -32,6 +32,8 @@ import JobCard from "../components/JobCard";
 
 import toast from "react-hot-toast";
 
+import { Link } from "react-router-dom";
+
 const { Title, Text } = Typography;
 const { TextArea } = Input;
 
@@ -53,32 +55,52 @@ function ClientDashboard() {
     });
 
   // Fetch Jobs
-  const fetchJobs = async () => {
+const fetchJobs = async () => {
 
-    try {
+  try {
 
-      setLoading(true);
+    setLoading(true);
 
-      const res =
-        await API.get(
-          "jobs/client/my-jobs"
-        );
-
-      setJobs(res.data.data);
-
-    } catch (error) {
-
-      toast.error(
-        error.response?.data?.message
-        || "Failed to fetch jobs"
+    const res =
+      await API.get(
+        "/jobs/client/my-jobs"
       );
 
-    } finally {
+    // attach reviews to every job
+    const jobsWithReviews =
+      await Promise.all(
 
-      setLoading(false);
+        res.data.data.map(
+          async (job) => {
 
-    }
-  };
+           const reviewRes =
+  await API.get(
+    `/reviews/job/${job._id}`
+  );
+
+return {
+  ...job,
+  review: reviewRes.data.data
+};
+          }
+        )
+      );
+
+    setJobs(jobsWithReviews);
+
+  } catch (error) {
+
+    toast.error(
+      error.response?.data?.message
+      || "Failed to fetch jobs"
+    );
+
+  } finally {
+
+    setLoading(false);
+
+  }
+};
 
   // Handle Input
   const handleChange = (
@@ -367,14 +389,11 @@ function ClientDashboard() {
             >
 
               <div key={job._id}>
-  <JobCard job={job} />
 
-  {job.status === "completed" && (
-    <ReviewForm
-      jobId={job._id}
-      onReviewSubmitted={fetchJobs}
-    />
-  )}
+<JobCard
+  job={job}
+  showReviewButton={true}
+/>
 
   <hr />
 </div>
