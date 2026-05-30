@@ -68,23 +68,31 @@ function ClientDashboard() {
 
       // attach reviews to every job
       const jobsWithReviews =
-        await Promise.all(
+  await Promise.all(
+    res.data.data.map(async (job) => {
 
-          res.data.data.map(
-            async (job) => {
+      try {
 
-              const reviewRes =
-                await API.get(
-                  `/reviews/job/${job._id}`
-                );
+        const reviewRes =
+          await API.get(
+            `/reviews/job/${job._id}`
+          );
 
-              return {
-                ...job,
-                review: reviewRes.data.data
-              };
-            }
-          )
-        );
+        return {
+          ...job,
+          review: reviewRes.data.data
+        };
+
+      } catch {
+
+        return {
+          ...job,
+          review: null
+        };
+      }
+
+    })
+  );
 
       setJobs(jobsWithReviews);
 
