@@ -100,6 +100,33 @@ function JobCard({
       }
     };
 
+
+    const showDeleteConfirm = () => {
+
+  Modal.confirm({
+
+    title: "Delete Job",
+
+    content:
+      "Are you sure you want to delete this job?",
+
+    okText: "Delete",
+
+    okType: "danger",
+
+    cancelText: "Cancel",
+
+    onOk() {
+
+      if (onDelete) {
+        onDelete(job._id);
+      }
+
+    }
+
+  });
+
+};
   return (
 
     <Card
