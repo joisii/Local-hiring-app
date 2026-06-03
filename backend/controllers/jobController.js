@@ -221,3 +221,40 @@ export const getClientJobs = async (req, res) => {
     });
   }
 };
+
+export const deleteJob = async (req, res) => {
+  try {
+
+    const job = await Job.findById(req.params.id);
+
+    if (!job) {
+      return res.status(404).json({
+        success: false,
+        message: "Job not found"
+      });
+    }
+
+    // Only owner can delete
+    if (job.client.toString() !== req.user.id) {
+      return res.status(403).json({
+        success: false,
+        message: "Not authorized to delete this job"
+      });
+    }
+
+    await job.deleteOne();
+
+    res.status(200).json({
+      success: true,
+      message: "Job deleted successfully"
+    });
+
+  } catch (error) {
+
+    res.status(500).json({
+      success: false,
+      message: error.message
+    });
+
+  }
+};

@@ -10,6 +10,8 @@ import {
   Col
 } from "antd";
 
+import { Modal } from "antd";
+
 import {
   UserOutlined,
   MailOutlined,
@@ -25,6 +27,7 @@ import {
   Link
 } from "react-router-dom";
 
+import { useState } from "react";
 const {
   Title,
   Text,
@@ -35,10 +38,14 @@ function JobCard({
   job,
   onAccept,
   onStatusUpdate,
+  onDelete,
   currentUser,
   showReviewButton = false
 }) {
 
+
+  const [expanded, setExpanded] =
+  useState(false);
   // status color
   const getStatusColor =
     (status) => {
@@ -93,6 +100,33 @@ function JobCard({
       }
     };
 
+const showDeleteConfirm = () => {
+
+  Modal.confirm({
+
+    title: "Delete Job",
+
+    content:
+      "Are you sure you want to delete this job?",
+
+    okText: "Delete",
+
+    okType: "danger",
+
+    cancelText: "Cancel",
+
+    onOk() {
+
+      if (onDelete) {
+        onDelete(job._id);
+      }
+
+    }
+
+  });
+
+};
+
   return (
 
     <Card
@@ -139,18 +173,46 @@ function JobCard({
             </Title>
 
             {/* DESCRIPTION */}
-            <Paragraph
-              type="secondary"
-              ellipsis={{
-                rows: 3
-              }}
-              style={{
-                marginBottom: 0,
-                lineHeight: 1.7
-              }}
-            >
-              {job.description}
-            </Paragraph>
+          <>
+
+  <Paragraph
+    type="secondary"
+    ellipsis={
+      expanded
+        ? false
+        : {
+            rows: 3
+          }
+    }
+    style={{
+      marginBottom: 0,
+      lineHeight: 1.7
+    }}
+  >
+    {job.description}
+  </Paragraph>
+
+  {job.description?.length > 120 && (
+
+    <Button
+      type="link"
+      size="small"
+      style={{
+        padding: 0,
+        marginTop: "4px"
+      }}
+      onClick={() =>
+        setExpanded(!expanded)
+      }
+    >
+      {expanded
+        ? "Show Less"
+        : "Read More"}
+    </Button>
+
+  )}
+
+</>
 
           </Space>
 
@@ -649,6 +711,33 @@ function JobCard({
                 >
                   Give Review
                 </Button>
+
+                <Space
+  wrap
+  size="middle"
+  style={{
+    width: "100%"
+  }}
+>{/* DELETE JOB */}
+
+{currentUser?.role === "client" &&
+  job.status === "pending" &&
+  onDelete && (
+
+    <Button
+      danger
+      size="large"
+      onClick={showDeleteConfirm}
+      style={{
+        borderRadius: "12px",
+        fontWeight: "600"
+      }}
+    >
+      Delete Job
+    </Button>
+
+)}
+</Space>
 
               </Link>
 

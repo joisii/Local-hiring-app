@@ -3,8 +3,10 @@
     createJob,
     getJobs,
     acceptJob,
-    updateJobStatus
+    updateJobStatus,
+    deleteJob
   } from "../controllers/jobController.js";
+
   import {
     getWorkerJobs,
     getClientJobs
@@ -45,4 +47,11 @@
     getClientJobs
   );
 
+
+  router.delete(
+  "/:id",
+  protect,
+  authorizeRoles("client"),
+  deleteJob
+);
   export default router;

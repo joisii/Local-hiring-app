@@ -161,6 +161,29 @@ function ClientDashboard() {
     }
   };
 
+  const handleDeleteJob = async (jobId) => {
+
+  try {
+
+    await API.delete(`/jobs/${jobId}`);
+
+    toast.success(
+      "Job deleted successfully"
+    );
+
+    fetchJobs();
+
+  } catch (error) {
+
+    toast.error(
+      error.response?.data?.message ||
+      "Delete failed"
+    );
+
+  }
+
+};
+
   useEffect(() => {
     fetchJobs();
   }, []);
@@ -585,10 +608,14 @@ function ClientDashboard() {
                 }}
               >
 
-                <JobCard
-                  job={job}
-                  showReviewButton={true}
-                />
+              <JobCard
+  job={job}
+  currentUser={{
+    role: "client"
+  }}
+  onDelete={handleDeleteJob}
+  showReviewButton={true}
+/>
 
               </div>
 
