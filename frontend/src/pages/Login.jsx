@@ -67,8 +67,6 @@ function Login() {
         values
       );
 
-      console.log(res.data);
-
       const {
         accessToken,
         user

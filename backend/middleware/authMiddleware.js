@@ -26,6 +26,7 @@ export const protect = (req, res, next) => {
     req.user = decoded;
 
     next();
+    console.log(decoded);
 
   } catch (error) {
     return res.status(401).json({
