@@ -1,3 +1,5 @@
+![Local Hiring App Banner](assets/banner.png)
+
 # Local Hiring App
 
 A full-stack MERN application that connects clients with skilled local workers through a streamlined hiring process.
