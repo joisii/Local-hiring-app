@@ -36,8 +36,9 @@ const { useBreakpoint } = Grid;
 
 function ReviewPage() {
 
-  const { jobId } =
-    useParams();
+  const { jobId } = useParams();
+
+console.log("JOB ID =", jobId);
 
   const navigate =
     useNavigate();
