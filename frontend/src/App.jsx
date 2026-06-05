@@ -50,7 +50,7 @@ function App() {
   }
 />
  <Route
-  path="/review/:id"
+  path="/review/:jobId"
   element={
     <ProtectedRoute allowedRole="client">
       <ReviewPage />
