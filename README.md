@@ -1,18 +1,22 @@
 ![Local Hiring App Banner](assets/banner.png)
 
 # Local Hiring App
+![React](https://img.shields.io/badge/React-19-blue)
+![Node.js](https://img.shields.io/badge/Node.js-Backend-green)
+![Express](https://img.shields.io/badge/Express.js-API-black)
+![MongoDB](https://img.shields.io/badge/MongoDB-Database-green)
+![JWT](https://img.shields.io/badge/JWT-Authentication-orange)
+![Vercel](https://img.shields.io/badge/Vercel-Deployed-black)
 
 A full-stack MERN application that connects clients with skilled local workers through a streamlined hiring process.
 
 ---
 
-## Live Demo
+## Quick Links
 
-https://local-hiring-app.vercel.app/
+🚀 Live Demo: https://local-hiring-app.vercel.app/
 
-## Repository
-
-https://github.com/joisii/Local-hiring-app
+💻 GitHub Repository: https://github.com/joisii/Local-hiring-app
 
 ---
 
